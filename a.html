@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klima Kontrol Paneli</title>
+</head>
+<body>
+
+<div class="container">
+  <h1>Klima Kontrol Paneli</h1>
+  <button id="toggle-led">Led'i Aç</button>
+</div>
+
+<script>
+  // Butonun olay dinleyicisi
+  document.getElementById("toggle-led").addEventListener("click", function() {
+    // Mevcut state değerini al
+    fetch('https://ledyakma-beef4-default-rtdb.europe-west1.firebasedatabase.app/led.json?auth=AIzaSyAnW3QQ2osPgIJgiVTlezWQv09eSsxfzhw')
+      .then(response => response.json())
+      .then(data => {
+        // State değerini al
+        const currentState = data.state || 0;
+
+        // Yeni state değerini belirle
+        const newState = currentState === 1 ? 0 : 1;
+
+        // State değerini güncelle
+        fetch('https://ledyakma-beef4-default-rtdb.europe-west1.firebasedatabase.app/led.json?auth=AIzaSyAnW3QQ2osPgIJgiVTlezWQv09eSsxfzhw', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ state: newState })
+        })
+        .then(response => {
+          if (response.ok) {
+            // Buton metnini güncelle
+            document.getElementById("toggle-led").innerText = newState === 1 ? "Led'i Kapat" : "Led'i Aç";
+          } else {
+            console.error('Failed to update state');
+          }
+        })
+        .catch(error => {
+          console.error('An error occurred:', error);
+        });
+      })
+      .catch(error => {
+        console.error('An error occurred:', error);
+      });
+  });
+</script>
+
+</body>
+</html>
